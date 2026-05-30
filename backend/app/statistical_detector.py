@@ -30,6 +30,7 @@ _raw_linear: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict
 _country_counts: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
 _name_country_counts: dict[tuple[str, str], dict[str, int]] = defaultdict(lambda: defaultdict(int))
 _name_rate_stats: dict[tuple[str, str], dict[str, float]] = {}
+_name_min_gap: dict[tuple[str, str], float] = {}
 _compiled: dict[str, dict[str, dict[str, float]]] = {}
 _compiled_linear: dict[str, dict[str, dict[str, float]]] = {}
 
@@ -99,13 +100,18 @@ def _train() -> None:
                     _country_counts[action][country] += 1
                     _name_country_counts[(action, output_name)][country] += 1
                 child_ts = _parse_ts(att.get("timestamp", ""))
+                att_min_gap = float("inf")
                 for parent_ref in att.get("parents", []) or []:
                     parent = att_map.get(parent_ref.get("attestation_id"))
                     parent_ts = _parse_ts(parent.get("timestamp", "")) if parent else None
                     if parent_ts and child_ts:
-                        _raw[action]["parent_gap_hours"].append(
-                            _log(max((child_ts - parent_ts).total_seconds() / 3600, 0.0))
-                        )
+                        gap_hours = max((child_ts - parent_ts).total_seconds() / 3600, 0.0)
+                        _raw[action]["parent_gap_hours"].append(_log(gap_hours))
+                        att_min_gap = min(att_min_gap, gap_hours)
+                if att_min_gap < float("inf"):
+                    key = (action, output_name)
+                    if key not in _name_min_gap or att_min_gap < _name_min_gap[key]:
+                        _name_min_gap[key] = att_min_gap
 
     for action, features in _raw.items():
         _compiled[action] = {}
@@ -206,13 +212,7 @@ def detect_statistical_anomalies(attestations: list[dict], z_threshold: float = 
                         )
                         flagged = True
 
-        checks: list[tuple[str, float, str]] = []
         if not flagged:
-            if hours > 0 and "labour_hours" in stats:
-                checks.append(("statistical_labour_anomaly", _log(hours), "labour_hours"))
-            if material > 0 and "material_cad" in stats:
-                checks.append(("statistical_material_anomaly", _log(material), "material_cad"))
-
             child_ts = _parse_ts(att.get("timestamp", ""))
             gaps = []
             for parent_ref in att.get("parents", []) or []:
@@ -220,13 +220,27 @@ def detect_statistical_anomalies(attestations: list[dict], z_threshold: float = 
                 parent_ts = _parse_ts(parent.get("timestamp", "")) if parent else None
                 if child_ts and parent_ts:
                     gaps.append(max((child_ts - parent_ts).total_seconds() / 3600, 0.0))
-            if gaps and "parent_gap_hours" in stats:
-                checks.append(("statistical_timing_anomaly", _log(min(gaps)), "parent_gap_hours"))
+
+            if gaps:
+                min_gap = min(gaps)
+                clean_floor = _name_min_gap.get((action, output_name))
+                if clean_floor is not None and min_gap < clean_floor * 0.9:
+                    result.append(
+                        {
+                            "type": "statistical_timing_anomaly",
+                            "attestation_id": att_id,
+                            "details": f"min parent gap {min_gap:.1f}h below clean floor {clean_floor:.1f}h for {action}/{output_name}",
+                        }
+                    )
+                    flagged = True
+
+        checks: list[tuple[str, float, str]] = []
+        if not flagged:
+            if material > 0 and "material_cad" in stats:
+                checks.append(("statistical_material_anomaly", _log(material), "material_cad"))
 
             feature_thresholds = {
                 "material_cad": 3.4,
-                "labour_hours": 3.4,
-                "parent_gap_hours": 4.2,
             }
             for anomaly_type, value, feature in checks:
                 z = _z(value, stats[feature])
