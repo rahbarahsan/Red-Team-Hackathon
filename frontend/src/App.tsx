@@ -53,6 +53,7 @@ export default function App() {
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const [supplierPreview, setSupplierPreview] = useState(defaultSupplierJson());
   const [issuedAttestation, setIssuedAttestation] = useState<Attestation | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   useEffect(() => {
     void loadSample();
@@ -178,6 +179,26 @@ export default function App() {
     } catch (exc) {
       setError(exc instanceof Error ? exc.message : "Could not issue signed attestation.");
     }
+  }
+
+  function downloadAttestation(att: Attestation) {
+    const json = JSON.stringify(att, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${att.attestation_id}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function copyToClipboard(text: string, field: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 2000);
+    });
   }
 
   function updateSupplierDraft(updates: Record<string, string | number>) {
@@ -339,96 +360,153 @@ export default function App() {
               <p>
                 Issue a real signed attestation using the private keys supplied in the challenge kit. This creates a cryptographic contribution record for downstream buyers.
               </p>
-              <div className="supplier-grid">
-                <div>
-                  <GcdsInput
-                    inputId="supplier-id"
-                    label="Supplier ID"
-                    value={String(supplierDraft.supplier_id ?? "")}
-                    onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ supplier_id: String(event.detail.value) })}
-                  />
-                  <GcdsInput
-                    inputId="action-type"
-                    label="Action type"
-                    value={String(supplierDraft.action_type ?? "")}
-                    onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ action_type: String(event.detail.value) })}
-                  />
-                  <GcdsInput
-                    inputId="country"
-                    label="Performed in country"
-                    value={String(supplierDraft.performed_in_country ?? "")}
-                    onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ performed_in_country: String(event.detail.value) })}
-                  />
-                  <GcdsInput
-                    inputId="output-name"
-                    label="Output name"
-                    value={String(supplierDraft.output?.name ?? "")}
-                    onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ output_name: String(event.detail.value) })}
-                  />
-                  <GcdsInput
-                    inputId="quantity-produced"
-                    label="Quantity produced"
-                    value={String(supplierDraft.output?.quantity_produced ?? 1)}
-                    onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ quantity_produced: Number(event.detail.value) })}
-                  />
-                  <GcdsInput
-                    inputId="output-unit"
-                    label="Output unit"
-                    value={String(supplierDraft.output?.unit ?? "units")}
-                    onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ unit: String(event.detail.value) })}
-                  />
-                  <GcdsInput
-                    inputId="material-cost"
-                    label="Material cost CAD"
-                    value={String(supplierDraft.costs?.material_cad ?? 0)}
-                    onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ material_cad: Number(event.detail.value) })}
-                  />
-                  <GcdsInput
-                    inputId="labour-hours"
-                    label="Labour hours"
-                    value={String(supplierDraft.costs?.labour_hours ?? 0)}
-                    onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ labour_hours: Number(event.detail.value) })}
-                  />
-                  <GcdsInput
-                    inputId="labour-cost"
-                    label="Labour cost CAD"
-                    value={String(supplierDraft.costs?.labour_cost_cad ?? 0)}
-                    onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ labour_cost_cad: Number(event.detail.value) })}
-                  />
+
+              <div className="supplier-form">
+                <fieldset className="form-group">
+                  <legend>Supplier information</legend>
+                  <div className="form-group-fields">
+                    <GcdsInput
+                      inputId="supplier-id"
+                      label="Supplier ID"
+                      value={String(supplierDraft.supplier_id ?? "")}
+                      onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ supplier_id: String(event.detail.value) })}
+                    />
+                    <GcdsInput
+                      inputId="action-type"
+                      label="Action type"
+                      value={String(supplierDraft.action_type ?? "")}
+                      onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ action_type: String(event.detail.value) })}
+                    />
+                    <GcdsInput
+                      inputId="country"
+                      label="Performed in country"
+                      value={String(supplierDraft.performed_in_country ?? "")}
+                      onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ performed_in_country: String(event.detail.value) })}
+                    />
+                  </div>
+                </fieldset>
+
+                <fieldset className="form-group">
+                  <legend>Output details</legend>
+                  <div className="form-group-fields">
+                    <GcdsInput
+                      inputId="output-name"
+                      label="Output name"
+                      value={String(supplierDraft.output?.name ?? "")}
+                      onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ output_name: String(event.detail.value) })}
+                    />
+                    <GcdsInput
+                      inputId="quantity-produced"
+                      label="Quantity produced"
+                      value={String(supplierDraft.output?.quantity_produced ?? 1)}
+                      onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ quantity_produced: Number(event.detail.value) })}
+                    />
+                    <GcdsInput
+                      inputId="output-unit"
+                      label="Output unit"
+                      value={String(supplierDraft.output?.unit ?? "units")}
+                      onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ unit: String(event.detail.value) })}
+                    />
+                  </div>
+                </fieldset>
+
+                <fieldset className="form-group">
+                  <legend>Cost breakdown</legend>
+                  <div className="form-group-fields">
+                    <GcdsInput
+                      inputId="material-cost"
+                      label="Material cost (CAD)"
+                      value={String(supplierDraft.costs?.material_cad ?? 0)}
+                      onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ material_cad: Number(event.detail.value) })}
+                    />
+                    <GcdsInput
+                      inputId="labour-hours"
+                      label="Labour hours"
+                      value={String(supplierDraft.costs?.labour_hours ?? 0)}
+                      onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ labour_hours: Number(event.detail.value) })}
+                    />
+                    <GcdsInput
+                      inputId="labour-cost"
+                      label="Labour cost (CAD)"
+                      value={String(supplierDraft.costs?.labour_cost_cad ?? 0)}
+                      onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ labour_cost_cad: Number(event.detail.value) })}
+                    />
+                  </div>
+                </fieldset>
+
+                <fieldset className="form-group">
+                  <legend>Parent inputs</legend>
                   <GcdsTextarea
                     textareaId="parents-json"
-                    label="Parent inputs JSON"
-                    rows={6}
+                    label="Parent attestation references (JSON array)"
+                    rows={5}
                     value={JSON.stringify(supplierDraft.parents ?? [], null, 2)}
                     onGcdsInput={(event: CustomEvent) => updateSupplierDraft({ parents_json: String(event.detail.value) })}
                   />
-                  <div className="supplier-callout">
-                    <p className="eyebrow">Canadian SME workflow</p>
-                    <p>Suppliers record labour, materials, location, and parent inputs, then issue a signed node that travels with the product.</p>
-                    <GcdsButton onClick={issueAttestation}>Issue signed attestation</GcdsButton>
-                  </div>
+                </fieldset>
+
+                <div className="supplier-callout">
+                  <p className="eyebrow">Canadian SME workflow</p>
+                  <p>Suppliers record labour, materials, location, and parent inputs, then issue a signed node that travels with the product.</p>
+                  <GcdsButton onClick={issueAttestation}>Issue signed attestation</GcdsButton>
                 </div>
-                <GcdsTextarea
-                  textareaId="supplier-json"
-                  label="Unsigned attestation payload"
-                  rows={16}
-                  value={supplierPreview}
-                  onGcdsInput={(event: CustomEvent) => setSupplierPreview(String(event.detail.value))}
-                />
               </div>
+
               {issuedAttestation && (
-                <div className="issued-panel">
+                <div className="issued-card">
                   <GcdsNotice noticeRole="success" noticeTitle="Signed attestation issued" noticeTitleTag="h3">
                     <p className="notice-copy">
-                      Attestation <code>{issuedAttestation.attestation_id}</code> was signed with Ed25519 and is ready to attach to a product chain.
+                      Your attestation has been signed with Ed25519 and is ready to attach to a product chain.
                     </p>
                   </GcdsNotice>
-                  <GcdsTextarea
-                    textareaId="signed-attestation"
-                    label="Signed attestation JSON"
-                    rows={14}
-                    value={JSON.stringify(issuedAttestation, null, 2)}
-                  />
+
+                  <dl className="issued-fields">
+                    <div className="issued-field">
+                      <dt>Attestation ID</dt>
+                      <dd>
+                        <code>{issuedAttestation.attestation_id}</code>
+                        <button className="copy-btn" onClick={() => copyToClipboard(issuedAttestation.attestation_id, "id")} title="Copy attestation ID">
+                          {copiedField === "id" ? "Copied!" : "Copy"}
+                        </button>
+                      </dd>
+                    </div>
+                    <div className="issued-field">
+                      <dt>Supplier</dt>
+                      <dd>{issuedAttestation.supplier_id}</dd>
+                    </div>
+                    <div className="issued-field">
+                      <dt>Action</dt>
+                      <dd>{issuedAttestation.action_type.replace(/_/g, " ")}</dd>
+                    </div>
+                    <div className="issued-field">
+                      <dt>Country</dt>
+                      <dd>{issuedAttestation.performed_in_country}</dd>
+                    </div>
+                    <div className="issued-field">
+                      <dt>Timestamp</dt>
+                      <dd>{issuedAttestation.timestamp}</dd>
+                    </div>
+                    <div className="issued-field full-width">
+                      <dt>Signature</dt>
+                      <dd>
+                        <code className="sig-preview">
+                          {issuedAttestation.signature.value.slice(0, 12)}…{issuedAttestation.signature.value.slice(-12)}
+                        </code>
+                        <button className="copy-btn" onClick={() => copyToClipboard(issuedAttestation.signature.value, "sig")} title="Copy full signature">
+                          {copiedField === "sig" ? "Copied!" : "Copy"}
+                        </button>
+                      </dd>
+                    </div>
+                  </dl>
+
+                  <div className="issued-actions">
+                    <GcdsButton onClick={() => downloadAttestation(issuedAttestation)}>
+                      Download signed attestation (.json)
+                    </GcdsButton>
+                    <GcdsButton buttonRole="secondary" onClick={() => copyToClipboard(JSON.stringify(issuedAttestation, null, 2), "json")}>
+                      {copiedField === "json" ? "Copied to clipboard!" : "Copy full JSON"}
+                    </GcdsButton>
+                  </div>
                 </div>
               )}
             </section>
