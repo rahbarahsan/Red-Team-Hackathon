@@ -223,18 +223,19 @@ def _check_cycles(att_map: dict[str, dict], anomalies: list[Anomaly]) -> None:
     flagged: set[str] = set()
 
     def visit(att_id: str) -> None:
-        if att_id in visiting:
-            if att_id not in flagged:
-                flagged.add(att_id)
-                anomalies.append(Anomaly("circular_reference", att_id, "Cycle in parent graph"))
-            return
-        if att_id in visited:
+        if att_id in visiting or att_id in visited:
             return
         visiting.add(att_id)
         for parent in att_map[att_id].get("parents", []):
             parent_id = parent.get("attestation_id", "")
             if parent_id in att_map:
-                visit(parent_id)
+                if parent_id in visiting:
+                    # att_id references parent_id which is an ancestor — att_id closes the cycle
+                    if att_id not in flagged:
+                        flagged.add(att_id)
+                        anomalies.append(Anomaly("circular_reference", att_id, "Cycle in parent graph"))
+                else:
+                    visit(parent_id)
         visiting.remove(att_id)
         visited.add(att_id)
 

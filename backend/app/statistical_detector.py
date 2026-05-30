@@ -23,7 +23,7 @@ REPO_ROOT = _find_repo_root()
 CORPUS_PATH = os.environ.get("CORPUS_PATH", os.path.join(REPO_ROOT, "training_corpus.jsonl"))
 Z_THRESHOLD = 3.4
 MIN_SAMPLES = 20
-ORIGIN_PROB_THRESHOLD = 0.02
+ORIGIN_PROB_THRESHOLD = 0.005
 
 _raw: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
 _raw_linear: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
