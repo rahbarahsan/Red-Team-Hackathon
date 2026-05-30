@@ -34,7 +34,12 @@ PRODUCTS = {
         "product_id": "att-anchor-0012",
         "name": "Recovery-Capable ISR Drone",
         "chain_path": os.path.join(REPO_ROOT, "worked-example", "recovery_drone_chain.json"),
-    }
+    },
+    "att-demo-0012": {
+        "product_id": "att-demo-0012",
+        "name": "Tactical Communication Radio",
+        "chain_path": os.path.join(REPO_ROOT, "EXAMPLE DATA", "tactical_radio_chain.json"),
+    },
 }
 
 

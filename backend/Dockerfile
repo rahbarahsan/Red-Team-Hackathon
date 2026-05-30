@@ -15,6 +15,7 @@ COPY registry /app/registry
 COPY private_keys /app/private_keys
 COPY training_corpus.jsonl /app/training_corpus.jsonl
 COPY worked-example /app/worked-example
+COPY ["EXAMPLE DATA", "/app/EXAMPLE DATA/"]
 
 EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--app-dir", "/app/backend", "--host", "0.0.0.0", "--port", "8000"]

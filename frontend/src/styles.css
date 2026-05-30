@@ -678,6 +678,21 @@ code {
   margin: 0.25rem 0;
 }
 
+.percentage.pct-green {
+  color: #198754;
+}
+
+.percentage.pct-warning {
+  color: #d48806;
+}
+
+.metric-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
 .designation {
   font-size: 1.25rem;
   font-weight: 700;

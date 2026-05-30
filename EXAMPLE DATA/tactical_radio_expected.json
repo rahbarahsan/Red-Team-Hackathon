@@ -1,0 +1,23 @@
+{
+  "product_attestation_id": "att-demo-0012",
+  "canadian_content_percentage": 64.5,
+  "designation": "made_in_canada",
+  "chain_valid": false,
+  "anomalies": [
+    {
+      "type": "timestamp_inversion",
+      "attestation_id": "att-demo-0009",
+      "details": "Child attestation dated 2026-04-02 is before parent att-demo-0006 dated 2026-04-03."
+    },
+    {
+      "type": "parent_hash_mismatch",
+      "attestation_id": "att-demo-0011",
+      "details": "Content hash for parent att-demo-0004 does not match the actual attestation content."
+    },
+    {
+      "type": "cost_anomaly",
+      "attestation_id": "att-demo-0012",
+      "details": "Final integration labour of 0.5 hours ($40 CAD) is implausibly low for assembling a tactical radio from 4 subassemblies."
+    }
+  ]
+}

@@ -1,0 +1,351 @@
+{
+  "product_attestation_id": "att-demo-0012",
+  "attestations": [
+    {
+      "attestation_id": "att-demo-0001",
+      "version": "1.0",
+      "supplier_id": "sup-0003",
+      "timestamp": "2026-04-01T09:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "US",
+      "parents": [],
+      "output": {
+        "name": "Mil-Spec Aluminum Enclosure",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 185.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "t51VJtTkCNRnkIJusg0CbkGriK2Ej9lnzy5UVemlxEFEOZrq5xn4ciydSY82a2sfdiyb5/OylJvUNG+EB0lVBA=="
+      }
+    },
+    {
+      "attestation_id": "att-demo-0002",
+      "version": "1.0",
+      "supplier_id": "sup-0005",
+      "timestamp": "2026-04-01T09:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "CN",
+      "parents": [],
+      "output": {
+        "name": "Multi-Layer PCB Board",
+        "quantity_produced": 2,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 95.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "SR23bgLyJ1VM0rIlM4/W821rSdVOdVFcm18oTIUnw2kknmNUQrP6f5HpGsz9NjSI9e1Np6Aoza/KAQ8yJQGpDQ=="
+      }
+    },
+    {
+      "attestation_id": "att-demo-0003",
+      "version": "1.0",
+      "supplier_id": "sup-0008",
+      "timestamp": "2026-04-01T09:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "CA",
+      "parents": [],
+      "output": {
+        "name": "Wideband Antenna Assembly",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 220.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "f1JARfTV3RdaJNiTq2k/lpBP0B53Rse8Uy/LxpcMwDrMyOYGuDlwXPtQdF2+My2pJ7gu19dcTQY+mHp8SPeTCw=="
+      }
+    },
+    {
+      "attestation_id": "att-demo-0004",
+      "version": "1.0",
+      "supplier_id": "sup-0010",
+      "timestamp": "2026-04-02T10:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "JP",
+      "parents": [],
+      "output": {
+        "name": "Lithium Battery Pack",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 150.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "baskM/UCcYSRXZZCGFpod13oHxh5/Oz+pBokkAzkCZh8JFMADhaTGc6tj+Z2NOybW5qTvJ/6kHPHoZ3LpTlqDA=="
+      }
+    },
+    {
+      "attestation_id": "att-demo-0005",
+      "version": "1.0",
+      "supplier_id": "sup-0012",
+      "timestamp": "2026-04-02T10:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "CA",
+      "parents": [],
+      "output": {
+        "name": "Rubber Gasket Set",
+        "quantity_produced": 4,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 12.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "EG15IYNhWL1gzFX/SaN/WffYW/MgLKEANAIhmNqTL7P+/fXF3iTMJGCEPZgrF6goOrviYWrYqOuaf0cog0VmAg=="
+      }
+    },
+    {
+      "attestation_id": "att-demo-0006",
+      "version": "1.0",
+      "supplier_id": "sup-0015",
+      "timestamp": "2026-04-03T08:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "DE",
+      "parents": [],
+      "output": {
+        "name": "AES-256 Encryption Chip",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 310.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "8niT04rn1C5hw2W0omvXvwsAhvuKeqS1uFFBcn4g2DxCWiq4rp1AxngU4CQcul8SBcYW/cafFzo10dxE6ONBBQ=="
+      }
+    },
+    {
+      "attestation_id": "att-demo-0007",
+      "version": "1.0",
+      "supplier_id": "sup-0005",
+      "timestamp": "2026-04-03T08:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "CN",
+      "parents": [],
+      "output": {
+        "name": "OLED Display Module",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 75.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "0nMkIdVRzA7INzZ1KoajN4Rbr0+4QX82QkGlkgdmM1/6xDbgD/byES5ZA0G9pMRHeR0Rr9mZpjkA5CLpkeu8DA=="
+      }
+    },
+    {
+      "attestation_id": "att-demo-0008",
+      "version": "1.0",
+      "supplier_id": "sup-0012",
+      "timestamp": "2026-04-03T08:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "CA",
+      "parents": [],
+      "output": {
+        "name": "Stainless Steel Fastener Kit",
+        "quantity_produced": 16,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 8.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "FgKSlx7+x8rahBrHVZrdv24PKJqENZjWrxanQZDHsgesu+QwQb9ObAJgl50okYqmVpNdb4m7JO6oNT6e5o1gAQ=="
+      }
+    },
+    {
+      "attestation_id": "att-demo-0009",
+      "version": "1.0",
+      "supplier_id": "sup-0001",
+      "timestamp": "2026-04-02T08:00:00Z",
+      "action_type": "component_manufacture",
+      "performed_in_country": "CA",
+      "parents": [
+        {
+          "attestation_id": "att-demo-0002",
+          "content_hash": "d047a0bf78a689088be85b37db68ed7890398df836a8e7938e5a96b3348a56ff",
+          "quantity_consumed": 2,
+          "unit": "units"
+        },
+        {
+          "attestation_id": "att-demo-0006",
+          "content_hash": "91f66700858352a473a530bf4ed55e829ff1e51d28f5c771f92984e0b4fd6e82",
+          "quantity_consumed": 1,
+          "unit": "units"
+        }
+      ],
+      "output": {
+        "name": "RF Transceiver Board",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 0.0,
+        "labour_hours": 8.0,
+        "labour_cost_cad": 640.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "G4v/rl9f3IgQfRMZ4b0tSCcxM3/dz1V35atMaEhEx9Z1SN2jqZ/TmVa4gdrrzkQ68KXKDzD6CYEWaatg/19fDQ=="
+      }
+    },
+    {
+      "attestation_id": "att-demo-0010",
+      "version": "1.0",
+      "supplier_id": "sup-0001",
+      "timestamp": "2026-04-10T14:00:00Z",
+      "action_type": "component_manufacture",
+      "performed_in_country": "CA",
+      "parents": [
+        {
+          "attestation_id": "att-demo-0001",
+          "content_hash": "7c1e510964c5ae42f4b457309c008939aeb66bcdea843a7917c3ff341daecad9",
+          "quantity_consumed": 1,
+          "unit": "units"
+        },
+        {
+          "attestation_id": "att-demo-0005",
+          "content_hash": "19d17e8c3fd4fc7f7e9ddd47ccb08aecc191b17e1732c759a55a63efa85f0c04",
+          "quantity_consumed": 4,
+          "unit": "units"
+        },
+        {
+          "attestation_id": "att-demo-0008",
+          "content_hash": "12649f81f74b113540ad3533ccf9d6b6e0b1092576720caf60d1bd6e6de72215",
+          "quantity_consumed": 16,
+          "unit": "units"
+        }
+      ],
+      "output": {
+        "name": "Weatherproof Housing Assembly",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 0.0,
+        "labour_hours": 4.0,
+        "labour_cost_cad": 320.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "HwcX6rj0JH6DQyggX4WHkQ3CWCSFIPoBQiQlrMbn0x/lDuAUmbjtCnDJzfvp4AIU+4DJaUfxQV9fsQM9AvbgAQ=="
+      }
+    },
+    {
+      "attestation_id": "att-demo-0011",
+      "version": "1.0",
+      "supplier_id": "sup-0001",
+      "timestamp": "2026-04-12T10:00:00Z",
+      "action_type": "subassembly",
+      "performed_in_country": "CA",
+      "parents": [
+        {
+          "attestation_id": "att-demo-0004",
+          "content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "quantity_consumed": 1,
+          "unit": "units"
+        },
+        {
+          "attestation_id": "att-demo-0007",
+          "content_hash": "2c6c48b7bb09bda8da22a38c6ae5b908e72e3a4157fc061917babd9336457fc7",
+          "quantity_consumed": 1,
+          "unit": "units"
+        }
+      ],
+      "output": {
+        "name": "Power Management Unit",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 0.0,
+        "labour_hours": 3.0,
+        "labour_cost_cad": 240.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "UP63lXr2kR8UcGtS1BW5fMHrgEVTk70dBBu2bfxq+U+Qmvn7nXaq715LMx/HAy5jTOCi/GGGKjeyws48N+XrBQ=="
+      }
+    },
+    {
+      "attestation_id": "att-demo-0012",
+      "version": "1.0",
+      "supplier_id": "sup-0001",
+      "timestamp": "2026-04-20T16:00:00Z",
+      "action_type": "final_integration",
+      "performed_in_country": "CA",
+      "parents": [
+        {
+          "attestation_id": "att-demo-0003",
+          "content_hash": "f10d912455d48575fb6f29b9df04aa5f696023597c8e18407312d951a9c0dbac",
+          "quantity_consumed": 1,
+          "unit": "units"
+        },
+        {
+          "attestation_id": "att-demo-0009",
+          "content_hash": "ac9d53be0353b3f301f634a93843142b5af471da1a8f4870a2769aba53d4972d",
+          "quantity_consumed": 1,
+          "unit": "units"
+        },
+        {
+          "attestation_id": "att-demo-0010",
+          "content_hash": "9c9ce10f2cfec60a302988d9a1ed05bc2714eb7cfa25b1facfeb5d7820c6000b",
+          "quantity_consumed": 1,
+          "unit": "units"
+        },
+        {
+          "attestation_id": "att-demo-0011",
+          "content_hash": "11f88ed598fb8bd6aede7409c6717650d89a1f946e8efa1c30a5e427e8c73563",
+          "quantity_consumed": 1,
+          "unit": "units"
+        }
+      ],
+      "output": {
+        "name": "Tactical Communication Radio",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 0.0,
+        "labour_hours": 0.5,
+        "labour_cost_cad": 40.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "TveVJtfVuj6RHza0sWOZjoxu8JhxLfO5YEWw/OwSp46pcxluJjh4r2fRC2aeDXl9YUKAflI1PfCeTRUKUZWfCA=="
+      }
+    }
+  ]
+}

@@ -262,32 +262,43 @@ export default function ProvenanceTimeline({ verifyResult, attestations }: Props
         <div className="metric-main">
           <div>
             <p className="eyebrow">Verified Canadian content</p>
-            <p className="percentage">{(verifyResult.verified_percentage ?? verifyResult.canadian_content_percentage).toFixed(1)}%</p>
-            <p className="designation">{designationLabel(verifyResult.designation)}</p>
+            <p className={`percentage ${verifiedCostShare >= 99.5 ? "pct-green" : "pct-warning"}`}>
+              {(verifyResult.verified_percentage ?? verifyResult.canadian_content_percentage).toFixed(1)}%
+            </p>
+            <p className="designation">
+              {(verifyResult.verified_percentage ?? verifyResult.canadian_content_percentage) >= 98
+                ? "Product of Canada"
+                : (verifyResult.verified_percentage ?? verifyResult.canadian_content_percentage) >= 51
+                ? "Made in Canada"
+                : "Not Made in Canada"}
+            </p>
           </div>
-          {verifyResult.verified_percentage !== undefined && verifyResult.verified_percentage !== verifyResult.canadian_content_percentage && (
-            <div className="total-pct-note">
-              <span>Total Canadian content: {verifyResult.canadian_content_percentage.toFixed(1)}%</span>
-            </div>
-          )}
-        </div>
-
-        <div className="gauge-section">
-          <div className="gauge-labels">
-            <span className="gauge-label verified-label">Verified ({verifiedCostShare.toFixed(0)}%)</span>
-            {unverifiedCostShare > 0.5 && (
-              <span className="gauge-label unverified-label">Unverified ({unverifiedCostShare.toFixed(0)}%)</span>
+          <div className="metric-actions">
+            {verifyResult.verified_percentage !== undefined && verifyResult.verified_percentage !== verifyResult.canadian_content_percentage && (
+              <div className="total-pct-note">
+                <span>Total Canadian content: {verifyResult.canadian_content_percentage.toFixed(1)}%</span>
+              </div>
             )}
-          </div>
-          <div className="gauge-bar" aria-label={`${verifiedCostShare.toFixed(0)}% verified, ${unverifiedCostShare.toFixed(0)}% unverified by cost share`}>
-            <div className="gauge-verified" style={{ width: `${Math.max(0, Math.min(100, verifiedCostShare))}%` }} />
-            {unverifiedCostShare > 0.5 && (
-              <div className="gauge-unverified" style={{ width: `${Math.max(0, Math.min(100, unverifiedCostShare))}%` }} />
-            )}
-          </div>
-          <div className="gauge-legend">
-            <span className="legend-item"><span className="legend-swatch verified" /> Verified</span>
-            <span className="legend-item"><span className="legend-swatch unverified" /> Unverified</span>
+            <GcdsDetails detailsTitle="View verification breakdown">
+              <div className="gauge-section">
+                <div className="gauge-labels">
+                  <span className="gauge-label verified-label">Verified ({verifiedCostShare.toFixed(0)}%)</span>
+                  {unverifiedCostShare > 0.5 && (
+                    <span className="gauge-label unverified-label">Unverified ({unverifiedCostShare.toFixed(0)}%)</span>
+                  )}
+                </div>
+                <div className="gauge-bar" aria-label={`${verifiedCostShare.toFixed(0)}% verified, ${unverifiedCostShare.toFixed(0)}% unverified by cost share`}>
+                  <div className="gauge-verified" style={{ width: `${Math.max(0, Math.min(100, verifiedCostShare))}%` }} />
+                  {unverifiedCostShare > 0.5 && (
+                    <div className="gauge-unverified" style={{ width: `${Math.max(0, Math.min(100, unverifiedCostShare))}%` }} />
+                  )}
+                </div>
+                <div className="gauge-legend">
+                  <span className="legend-item"><span className="legend-swatch verified" /> Verified</span>
+                  <span className="legend-item"><span className="legend-swatch unverified" /> Unverified</span>
+                </div>
+              </div>
+            </GcdsDetails>
           </div>
         </div>
 
