@@ -9,7 +9,7 @@ import {
   GcdsTextarea,
 } from "@gcds-core/components-react";
 import { Html5Qrcode } from "html5-qrcode";
-import { QRCodeSVG } from "qrcode.react";
+import { QRCodeSVG, QRCodeCanvas } from "qrcode.react";
 import ProvenanceTimeline from "./components/ProvenanceTimeline";
 import type { Attestation, ChainRequest, VerifyResult } from "./types";
 
@@ -192,6 +192,19 @@ export default function App() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+
+  function downloadQrCode(attId: string) {
+    const container = document.getElementById("attestation-qr");
+    const canvas = container?.querySelector("canvas");
+    if (!canvas) return;
+    const url = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${attId}-qr.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   function copyToClipboard(text: string, field: string) {
@@ -499,9 +512,23 @@ export default function App() {
                     </div>
                   </dl>
 
+                  <div className="issued-qr" id="attestation-qr">
+                    <p className="eyebrow">Scannable attestation</p>
+                    <QRCodeCanvas
+                      value={JSON.stringify(issuedAttestation)}
+                      size={200}
+                      level="M"
+                      includeMargin
+                    />
+                    <p className="qr-caption">Scan to import this signed attestation into a product chain</p>
+                  </div>
+
                   <div className="issued-actions">
                     <GcdsButton onClick={() => downloadAttestation(issuedAttestation)}>
                       Download signed attestation (.json)
+                    </GcdsButton>
+                    <GcdsButton buttonRole="secondary" onClick={() => downloadQrCode(issuedAttestation.attestation_id)}>
+                      Download QR code (.png)
                     </GcdsButton>
                     <GcdsButton buttonRole="secondary" onClick={() => copyToClipboard(JSON.stringify(issuedAttestation, null, 2), "json")}>
                       {copiedField === "json" ? "Copied to clipboard!" : "Copy full JSON"}
