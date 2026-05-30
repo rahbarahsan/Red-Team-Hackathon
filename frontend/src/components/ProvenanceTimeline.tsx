@@ -233,10 +233,16 @@ export default function ProvenanceTimeline({ verifyResult, attestations }: Props
     statusById.set(status.attestation_id, status);
   }
 
-  // Compute verified vs unverified cost shares
-  const verifiedCostShare = (verifyResult.attestation_statuses ?? [])
-    .filter((s) => s.verified)
-    .reduce((sum, s) => sum + s.cost_share, 0);
+  // Compute verified vs unverified within Canadian-performed attestations only
+  const canadianAtts = attestations.filter((a) => a.performed_in_country === "CA");
+  const canadianTotal = canadianAtts.reduce((sum, a) => sum + a.costs.material_cad + a.costs.labour_cost_cad, 0);
+  const canadianVerifiedCost = canadianAtts
+    .filter((a) => {
+      const status = statusById.get(a.attestation_id);
+      return status ? status.verified : !anomaliesById.has(a.attestation_id);
+    })
+    .reduce((sum, a) => sum + a.costs.material_cad + a.costs.labour_cost_cad, 0);
+  const verifiedCostShare = canadianTotal > 0 ? (canadianVerifiedCost / canadianTotal) * 100 : 100;
   const unverifiedCostShare = 100 - verifiedCostShare;
   const verifiedCount = (verifyResult.attestation_statuses ?? []).filter((s) => s.verified).length;
   const unverifiedCount = attestations.length - verifiedCount;
@@ -261,24 +267,19 @@ export default function ProvenanceTimeline({ verifyResult, attestations }: Props
       <div className="metric-panel" aria-label="Canadian content summary">
         <div className="metric-main">
           <div>
-            <p className="eyebrow">Verified Canadian content</p>
+            <p className="eyebrow">Canadian content</p>
             <p className={`percentage ${verifiedCostShare >= 99.5 ? "pct-green" : "pct-warning"}`}>
-              {(verifyResult.verified_percentage ?? verifyResult.canadian_content_percentage).toFixed(1)}%
+              {verifyResult.canadian_content_percentage.toFixed(1)}%
             </p>
             <p className="designation">
-              {(verifyResult.verified_percentage ?? verifyResult.canadian_content_percentage) >= 98
+              {verifyResult.canadian_content_percentage >= 98
                 ? "Product of Canada"
-                : (verifyResult.verified_percentage ?? verifyResult.canadian_content_percentage) >= 51
+                : verifyResult.canadian_content_percentage >= 51
                 ? "Made in Canada"
                 : "Not Made in Canada"}
             </p>
           </div>
           <div className="metric-actions">
-            {verifyResult.verified_percentage !== undefined && verifyResult.verified_percentage !== verifyResult.canadian_content_percentage && (
-              <div className="total-pct-note">
-                <span>Total Canadian content: {verifyResult.canadian_content_percentage.toFixed(1)}%</span>
-              </div>
-            )}
             <GcdsDetails detailsTitle="View verification breakdown">
               <div className="gauge-section">
                 <div className="gauge-labels">
