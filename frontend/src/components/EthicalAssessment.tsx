@@ -44,14 +44,8 @@ export default function EthicalAssessment({ ethicalRisks = [], confidenceScore, 
         <GcdsAlert 
           alertRole={confidenceScore.overall >= 80 ? "success" : confidenceScore.overall >= 60 ? "warning" : "danger"}
           heading={`${confidenceScore.overall}% confidence in Canadian content claim`}
+          hideCloseBtn
         >
-          <div className="confidence-breakdown">
-            <dl className="confidence-metrics">
-              <div><dt>Cryptographic verification</dt><dd>{confidenceScore.cryptographic}%</dd></div>
-              <div><dt>Statistical analysis</dt><dd>{confidenceScore.statistical}%</dd></div>
-              <div><dt>Ethical compliance</dt><dd>{confidenceScore.ethical}%</dd></div>
-            </dl>
-            
             {confidenceScore.reasoning.length > 0 && (
               <GcdsDetails detailsTitle="Assessment reasoning">
                 <ul>
@@ -61,7 +55,6 @@ export default function EthicalAssessment({ ethicalRisks = [], confidenceScore, 
                 </ul>
               </GcdsDetails>
             )}
-          </div>
         </GcdsAlert>
       )}
 
@@ -90,36 +83,6 @@ export default function EthicalAssessment({ ethicalRisks = [], confidenceScore, 
             </div>
           </div>
         </GcdsCard>
-      )}
-
-      {/* Supplier Verification Status */}
-      {unverifiedSuppliers.length > 0 && (
-        <GcdsAlert 
-          alertRole="warning"
-          heading="Supplier verification status"
-        >
-          <p>The following suppliers require additional due diligence:</p>
-          <ul>
-            {unverifiedSuppliers.map((supplier, index) => (
-              <li key={index}>
-                <strong>{supplier.supplier}</strong>: 
-                {supplier.auditStatus !== "verified" && (
-                  <span> Audit status: {supplier.auditStatus}</span>
-                )}
-                {supplier.concerns.length > 0 && (
-                  <span> - {supplier.concerns.join(", ")}</span>
-                )}
-                <span className="transparency-score"> (Transparency: {supplier.transparencyScore}%)</span>
-              </li>
-            ))}
-          </ul>
-          <p className="disclosure">
-            <small>
-              Assessment based on supplier-specific certifications, third-party audits, and transparency reporting.
-              Procurement officers should verify compliance with Government of Canada ethical sourcing requirements.
-            </small>
-          </p>
-        </GcdsAlert>
       )}
 
       {/* Procurement Guidance - Canada.ca pattern */}
