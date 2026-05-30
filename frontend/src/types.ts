@@ -42,6 +42,12 @@ export interface AnomalyRecord {
   details: string;
 }
 
+export interface AttestationStatus {
+  attestation_id: string;
+  verified: boolean;
+  cost_share: number;
+}
+
 export interface EthicalRisk {
   level: "low" | "medium" | "high" | "critical";
   category: "labor_conditions" | "child_labor" | "environmental" | "transparency";
@@ -63,6 +69,8 @@ export interface VerifyResult {
   designation: "product_of_canada" | "made_in_canada" | "none";
   chain_valid: boolean;
   anomalies: AnomalyRecord[];
+  verified_percentage: number;
+  attestation_statuses: AttestationStatus[];
   ethical_risks?: EthicalRisk[];
   confidence_score?: ConfidenceScore;
 }

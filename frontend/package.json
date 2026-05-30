@@ -14,7 +14,7 @@
     "@gcds-core/css-shortcuts": "latest",
     "@vitejs/plugin-react": "latest",
     "html5-qrcode": "^2.3.8",
-    "qrcode.react": "latest",
+    "qrcode.react": "^4.2.0",
     "react": "latest",
     "react-dom": "latest",
     "typescript": "latest",

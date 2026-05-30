@@ -594,6 +594,82 @@ code {
   gap: 1.25rem;
 }
 
+.metric-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.total-pct-note {
+  background: #f1f2f4;
+  border: 1px solid #d6d9dd;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #4b5563;
+  align-self: center;
+}
+
+.gauge-section {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.gauge-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.verified-label { color: #198754; }
+.unverified-label { color: #d3080c; }
+
+.gauge-bar {
+  display: flex;
+  height: 1.25rem;
+  border: 1px solid #c9ced6;
+  overflow: hidden;
+  background: #e5e8ec;
+}
+
+.gauge-verified {
+  height: 100%;
+  background: #198754;
+  transition: width 0.4s ease;
+}
+
+.gauge-unverified {
+  height: 100%;
+  background: #d3080c;
+  transition: width 0.4s ease;
+}
+
+.gauge-legend {
+  display: flex;
+  gap: 1.25rem;
+  font-size: 0.78rem;
+  color: #4b5563;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.legend-swatch.verified { background: #198754; }
+.legend-swatch.unverified { background: #d3080c; }
+
 .percentage {
   color: #26374a;
   font-size: clamp(3rem, 8vw, 5.5rem);
@@ -608,29 +684,7 @@ code {
   margin: 0;
 }
 
-.gauge {
-  position: relative;
-  height: 1.25rem;
-  background: #e5e8ec;
-  border: 1px solid #c9ced6;
-}
-
-.gauge > div {
-  height: 100%;
-  background: linear-gradient(90deg, #d3080c, #ffcc33);
-}
-
-.threshold {
-  position: absolute;
-  top: 1.45rem;
-  transform: translateX(-50%);
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #26374a;
-}
-
-.threshold.made { left: 51%; }
-.threshold.product { left: 98%; }
+/* Old gauge styles removed — using new gauge-bar/gauge-verified/gauge-unverified instead */
 
 .summary-list,
 .attestation-facts,
@@ -716,6 +770,23 @@ dd {
   padding: 1rem;
 }
 
+.timeline li.is-verified .timeline-card {
+  border-left-color: #198754;
+}
+
+.timeline li.is-verified .timeline-marker {
+  background: #198754;
+}
+
+.timeline li.is-unverified .timeline-card {
+  border-left-color: #d3080c;
+  background: #fef2f2;
+}
+
+.timeline li.is-unverified .timeline-marker {
+  background: #d3080c;
+}
+
 .timeline li.is-canadian .timeline-card {
   border-left-color: #198754;
 }
@@ -741,13 +812,26 @@ dd {
 }
 
 .country,
-.anomaly-chip {
+.anomaly-chip,
+.status-badge {
   border: 1px solid #c9ced6;
   background: #f1f2f4;
   color: #26374a;
   font-weight: 700;
   padding: 0.35rem 0.55rem;
   white-space: nowrap;
+}
+
+.status-badge.verified {
+  border-color: #198754;
+  background: #e7f3ed;
+  color: #0f5132;
+}
+
+.status-badge.unverified {
+  border-color: #d3080c;
+  background: #fff1f1;
+  color: #8a0000;
 }
 
 .country.canadian {

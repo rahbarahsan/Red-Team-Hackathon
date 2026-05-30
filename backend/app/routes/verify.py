@@ -24,12 +24,20 @@ class AnomalyOut(BaseModel):
     details: str = ""
 
 
+class AttestationStatusOut(BaseModel):
+    attestation_id: str
+    verified: bool
+    cost_share: float = 0.0
+
+
 class VerifyResponse(BaseModel):
     product_attestation_id: str
     canadian_content_percentage: float
     designation: str
     chain_valid: bool
     anomalies: list[AnomalyOut]
+    verified_percentage: float = 0.0
+    attestation_statuses: list[AttestationStatusOut] = []
 
 
 @router.post("/verify", response_model=VerifyResponse)
@@ -53,12 +61,34 @@ async def verify(req: VerifyRequest) -> VerifyResponse:
                 if key not in existing:
                     existing.add(key)
                     anomalies.append(anomaly)
+
+        # Rebuild attestation statuses to include statistical anomalies
+        tainted_ids = {a["attestation_id"] for a in anomalies}
+        att_map = {str(a.get("attestation_id", "")): a for a in req.attestations if a.get("attestation_id")}
+        statuses: list[AttestationStatusOut] = []
+        total_cost = 0.0
+        for att in att_map.values():
+            costs = att.get("costs", {}) or {}
+            total_cost += float(costs.get("material_cad", 0)) + float(costs.get("labour_cost_cad", 0))
+        verified_canadian = 0.0
+        for att_id, att in att_map.items():
+            costs = att.get("costs", {}) or {}
+            node_cost = float(costs.get("material_cad", 0)) + float(costs.get("labour_cost_cad", 0))
+            share = (node_cost / total_cost * 100) if total_cost > 0 else 0.0
+            verified = att_id not in tainted_ids
+            statuses.append(AttestationStatusOut(attestation_id=att_id, verified=verified, cost_share=round(share, 6)))
+            if verified and att.get("performed_in_country") == "CA":
+                verified_canadian += node_cost
+        verified_pct = (verified_canadian / total_cost * 100) if total_cost > 0 else 0.0
+
         return VerifyResponse(
             product_attestation_id=result.product_attestation_id,
             canadian_content_percentage=result.canadian_content_percentage,
             designation=result.designation,
             chain_valid=not anomalies,
             anomalies=[AnomalyOut(**a) for a in anomalies],
+            verified_percentage=round(verified_pct, 6),
+            attestation_statuses=statuses,
         )
     except HTTPException:
         raise

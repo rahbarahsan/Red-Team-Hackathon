@@ -83,12 +83,28 @@ class Anomaly:
 
 
 @dataclass
+class AttestationStatus:
+    attestation_id: str
+    verified: bool
+    cost_share: float = 0.0
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "attestation_id": self.attestation_id,
+            "verified": self.verified,
+            "cost_share": self.cost_share,
+        }
+
+
+@dataclass
 class VerifyResult:
     product_attestation_id: str
     canadian_content_percentage: float
     designation: str
     chain_valid: bool
     anomalies: list[Anomaly] = field(default_factory=list)
+    verified_percentage: float = 0.0
+    attestation_statuses: list[AttestationStatus] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -97,6 +113,8 @@ class VerifyResult:
             "designation": self.designation,
             "chain_valid": self.chain_valid,
             "anomalies": [a.to_dict() for a in self.anomalies],
+            "verified_percentage": self.verified_percentage,
+            "attestation_statuses": [s.to_dict() for s in self.attestation_statuses],
         }
 
 
@@ -143,12 +161,18 @@ def verify_chain(product_attestation_id: str, attestations: list[dict]) -> Verif
     percentage = _compute_percentage(att_map)
     designation = _compute_designation(product_attestation_id, att_map, percentage)
 
+    deduped = _dedupe_anomalies(anomalies)
+    tainted_ids = {a.attestation_id for a in deduped}
+    statuses, verified_pct = _build_attestation_statuses(att_map, tainted_ids)
+
     return VerifyResult(
         product_attestation_id=product_attestation_id,
         canadian_content_percentage=round(percentage, 6),
         designation=designation,
-        chain_valid=not anomalies,
-        anomalies=_dedupe_anomalies(anomalies),
+        chain_valid=not deduped,
+        anomalies=deduped,
+        verified_percentage=round(verified_pct, 6),
+        attestation_statuses=statuses,
     )
 
 
@@ -375,6 +399,37 @@ def _check_cost_and_transformation_plausibility(
                 anomalies.append(
                     Anomaly("transformation_implausible", att_id, "Transformation has negligible labour")
                 )
+
+
+def _build_attestation_statuses(
+    att_map: dict[str, dict], tainted_ids: set[str]
+) -> tuple[list[AttestationStatus], float]:
+    total_cost = 0.0
+    verified_canadian_cost = 0.0
+    total_cost_all = 0.0
+    statuses: list[AttestationStatus] = []
+
+    for att_id, att in att_map.items():
+        costs = att.get("costs", {}) or {}
+        node_cost = _as_float(costs.get("material_cad")) + _as_float(costs.get("labour_cost_cad"))
+        total_cost += node_cost
+
+    for att_id, att in att_map.items():
+        costs = att.get("costs", {}) or {}
+        node_cost = _as_float(costs.get("material_cad")) + _as_float(costs.get("labour_cost_cad"))
+        share = (node_cost / total_cost * 100) if total_cost > EPSILON else 0.0
+        verified = att_id not in tainted_ids
+        statuses.append(AttestationStatus(
+            attestation_id=att_id,
+            verified=verified,
+            cost_share=round(share, 6),
+        ))
+        if verified and att.get("performed_in_country") == "CA":
+            verified_canadian_cost += node_cost
+        total_cost_all += node_cost
+
+    verified_pct = (verified_canadian_cost / total_cost_all * 100) if total_cost_all > EPSILON else 0.0
+    return statuses, verified_pct
 
 
 def _compute_percentage(att_map: dict[str, dict]) -> float:

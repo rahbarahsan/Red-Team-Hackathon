@@ -7,7 +7,7 @@ import {
 } from "@gcds-core/components-react";
 import EthicalAssessment from "./EthicalAssessment";
 import AnomalyExplainer from "./AnomalyExplainer";
-import type { Attestation, VerifyResult, EthicalRisk, ConfidenceScore } from "../types";
+import type { Attestation, VerifyResult, EthicalRisk, ConfidenceScore, AttestationStatus } from "../types";
 
 interface Props {
   verifyResult: VerifyResult;
@@ -226,7 +226,21 @@ export default function ProvenanceTimeline({ verifyResult, attestations }: Props
     current.push(anomaly.type.replace(/_/g, " "));
     anomaliesById.set(anomaly.attestation_id, current);
   }
-  
+
+  // Build verification status map from backend data
+  const statusById = new Map<string, AttestationStatus>();
+  for (const status of verifyResult.attestation_statuses ?? []) {
+    statusById.set(status.attestation_id, status);
+  }
+
+  // Compute verified vs unverified cost shares
+  const verifiedCostShare = (verifyResult.attestation_statuses ?? [])
+    .filter((s) => s.verified)
+    .reduce((sum, s) => sum + s.cost_share, 0);
+  const unverifiedCostShare = 100 - verifiedCostShare;
+  const verifiedCount = (verifyResult.attestation_statuses ?? []).filter((s) => s.verified).length;
+  const unverifiedCount = attestations.length - verifiedCount;
+
   // Generate supplier-based ethical assessment
   const ethicalAssessment = generateSupplierBasedEthicalAssessment(attestations);
 
@@ -245,18 +259,40 @@ export default function ProvenanceTimeline({ verifyResult, attestations }: Props
       </GcdsNotice>
 
       <div className="metric-panel" aria-label="Canadian content summary">
-        <div>
-          <p className="eyebrow">Canadian content</p>
-          <p className="percentage">{verifyResult.canadian_content_percentage.toFixed(1)}%</p>
-          <p className="designation">{designationLabel(verifyResult.designation)}</p>
+        <div className="metric-main">
+          <div>
+            <p className="eyebrow">Verified Canadian content</p>
+            <p className="percentage">{(verifyResult.verified_percentage ?? verifyResult.canadian_content_percentage).toFixed(1)}%</p>
+            <p className="designation">{designationLabel(verifyResult.designation)}</p>
+          </div>
+          {verifyResult.verified_percentage !== undefined && verifyResult.verified_percentage !== verifyResult.canadian_content_percentage && (
+            <div className="total-pct-note">
+              <span>Total Canadian content: {verifyResult.canadian_content_percentage.toFixed(1)}%</span>
+            </div>
+          )}
         </div>
-        <div className="gauge" aria-hidden="true">
-          <div style={{ width: `${Math.max(0, Math.min(100, verifyResult.canadian_content_percentage))}%` }} />
-          <span className="threshold made">51%</span>
-          <span className="threshold product">98%</span>
+
+        <div className="gauge-section">
+          <div className="gauge-labels">
+            <span className="gauge-label verified-label">Verified ({verifiedCostShare.toFixed(0)}%)</span>
+            {unverifiedCostShare > 0.5 && (
+              <span className="gauge-label unverified-label">Unverified ({unverifiedCostShare.toFixed(0)}%)</span>
+            )}
+          </div>
+          <div className="gauge-bar" aria-label={`${verifiedCostShare.toFixed(0)}% verified, ${unverifiedCostShare.toFixed(0)}% unverified by cost share`}>
+            <div className="gauge-verified" style={{ width: `${Math.max(0, Math.min(100, verifiedCostShare))}%` }} />
+            {unverifiedCostShare > 0.5 && (
+              <div className="gauge-unverified" style={{ width: `${Math.max(0, Math.min(100, unverifiedCostShare))}%` }} />
+            )}
+          </div>
+          <div className="gauge-legend">
+            <span className="legend-item"><span className="legend-swatch verified" /> Verified</span>
+            <span className="legend-item"><span className="legend-swatch unverified" /> Unverified</span>
+          </div>
         </div>
+
         <dl className="summary-list">
-          <div><dt>Attestations</dt><dd>{attestations.length}</dd></div>
+          <div><dt>Attestations</dt><dd>{verifiedCount}/{attestations.length} verified</dd></div>
           <div><dt>Total direct cost</dt><dd>{money(total)}</dd></div>
           <div><dt>Product attestation</dt><dd><code>{verifyResult.product_attestation_id}</code></dd></div>
         </dl>
@@ -282,8 +318,11 @@ export default function ProvenanceTimeline({ verifyResult, attestations }: Props
             const cost = totalCost(att);
             const isCanadian = att.performed_in_country === "CA";
             const anomalies = anomaliesById.get(att.attestation_id) ?? [];
+            const status = statusById.get(att.attestation_id);
+            const isVerified = status ? status.verified : anomalies.length === 0;
+            const liClass = isVerified ? "is-verified" : "is-unverified";
             return (
-              <li key={att.attestation_id} className={anomalies.length ? "has-anomaly" : isCanadian ? "is-canadian" : ""}>
+              <li key={att.attestation_id} className={liClass}>
                 <div className="timeline-marker" aria-hidden="true">{index + 1}</div>
                 <div className="timeline-card">
                   <div className="timeline-header">
@@ -292,6 +331,9 @@ export default function ProvenanceTimeline({ verifyResult, attestations }: Props
                       <p>{actionLabels[att.action_type]} by {att.supplier_id}</p>
                     </div>
                     <div className="country-info">
+                      <span className={isVerified ? "status-badge verified" : "status-badge unverified"}>
+                        {isVerified ? "✓ Verified" : "✗ Unverified"}
+                      </span>
                       <span className={isCanadian ? "country canadian" : "country"}>
                         {countryNames[att.performed_in_country] ?? att.performed_in_country}
                       </span>
