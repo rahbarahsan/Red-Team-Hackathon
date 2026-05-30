@@ -31,6 +31,28 @@ cat worked-example/recovery_drone_expected.json      # valid, 58.4%, made_in_can
 python3 self_test.py http://localhost:8000/verify
 ```
 
+## Submission app
+
+This repository now includes a Docker Compose submission stack:
+
+```bash
+docker compose up --build
+```
+
+- Backend API: `http://localhost:8000/verify`
+- Backend health check: `http://localhost:8000/health`
+- Demo frontend: `http://localhost:5173`
+
+Run the local grader after the backend is up:
+
+```bash
+python3 self_test.py http://localhost:8000/verify
+```
+
+The backend is a FastAPI service in `backend/app/`. It verifies Ed25519 signatures, parent content hashes, anchor-registry mismatches, replay, cycles, dangling parents, unit mismatches, timestamp inversions, mass balance, cost plausibility, transformation plausibility, and conservative statistical outliers learned from `training_corpus.jsonl`.
+
+The frontend is a React/Vite app in `frontend/` using the official GC Design System packages for a Government of Canada-style purchaser verification flow and supplier attestation workspace.
+
 ## Training data format
 
 Each line of `training_corpus.jsonl`:
