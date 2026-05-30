@@ -44,8 +44,10 @@ graph TB
     DR --> PK
     DR --> WE
 
-    USER[Purchaser / End User] -->|"QR scan or manual ID"| PV
+    USER[Purchaser / End User] -->|"Scan Product QR or manual ID"| PV
     SUPPLIER[Supplier] -->|"Issue signed attestation"| SA
+    SA -->|"Generate Product QR + Attestation QR"| SUPPLIER
+    SUPPLIER -->|"Attach Product QR to goods"| USER
     HARNESS[Scoring Harness] -->|"POST /verify"| VR
 ```
 
@@ -109,9 +111,10 @@ sequenceDiagram
     participant BE as Backend
     participant REG as Registry
 
-    U->>FE: Scan QR / Enter Product ID
+    U->>FE: Scan Product QR / Enter ID
     FE->>BE: GET /products/{id}/chain
     BE-->>FE: Chain JSON (attestations[])
+    FE->>FE: Show chain-loaded summary bar
     FE->>BE: POST /verify {chain}
     BE->>REG: Load public keys & anchors
     BE->>BE: Verify signatures
@@ -119,8 +122,9 @@ sequenceDiagram
     BE->>BE: Check structural rules
     BE->>BE: Compute Canadian %
     BE->>BE: Run statistical detector
-    BE-->>FE: {percentage, designation, valid, anomalies}
-    FE-->>U: Provenance timeline + decision
+    BE-->>FE: {percentage, designation, valid, anomalies, attestation_statuses}
+    FE-->>U: Metric card + provenance timeline + decision
+    Note over FE: Raw JSON hidden behind collapsible toggle
 ```
 
 ## Data Flow: Supplier Attestation
@@ -132,20 +136,31 @@ sequenceDiagram
     participant BE as Backend
     participant PK as Private Keys
 
-    S->>FE: Fill attestation form
+    S->>FE: Fill attestation form (fieldset groups)
     FE->>BE: POST /issue-attestation {unsigned}
     BE->>PK: Load supplier private key
     BE->>BE: Canonical serialize
     BE->>BE: Ed25519 sign
     BE-->>FE: {signed attestation with signature}
-    FE-->>S: Download / copy signed JSON
+    FE-->>S: Summary card + QR codes
+    Note over FE,S: Product Lookup QR (attestation ID only)
+    Note over FE,S: Attestation QR (full signed JSON)
+    S->>S: Download .json / .png QR / copy JSON
+    S->>S: Attach Product QR to physical goods
 ```
+
+## QR Code Strategy
+
+| QR Code | Contents | Size | Purpose |
+|---|---|---|---|
+| Product Lookup QR | Attestation ID string | ~30 chars, compact | Printed on product label; purchaser scans to trigger chain lookup |
+| Attestation QR | Full signed JSON | ~500-1200 bytes | Offline cryptographic record transfer between systems |
 
 ## Technology Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | React, Vite, TypeScript, GC Design System, html5-qrcode |
+| Frontend | React, Vite, TypeScript, GC Design System, html5-qrcode, qrcode.react |
 | Backend | Python, FastAPI, uvicorn |
 | Crypto | Ed25519 (via `cryptography` library), SHA-256 |
 | Packaging | Docker Compose |

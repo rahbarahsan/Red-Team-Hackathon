@@ -195,14 +195,14 @@ export default function App() {
     URL.revokeObjectURL(url);
   }
 
-  function downloadQrCode(attId: string) {
-    const container = document.getElementById("attestation-qr");
+  function downloadQrCode(containerId: string, filename: string) {
+    const container = document.getElementById(containerId);
     const canvas = container?.querySelector("canvas");
     if (!canvas) return;
     const url = canvas.toDataURL("image/png");
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${attId}-qr.png`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -521,23 +521,38 @@ export default function App() {
                     </div>
                   </dl>
 
-                  <div className="issued-qr" id="attestation-qr">
-                    <p className="eyebrow">Scannable attestation</p>
-                    <QRCodeCanvas
-                      value={JSON.stringify(issuedAttestation)}
-                      size={200}
-                      level="M"
-                      includeMargin
-                    />
-                    <p className="qr-caption">Scan to import this signed attestation into a product chain</p>
+                  <div className="issued-qr-grid">
+                    <div className="issued-qr" id="product-qr">
+                      <p className="eyebrow">Product lookup QR</p>
+                      <QRCodeCanvas
+                        value={issuedAttestation.attestation_id}
+                        size={180}
+                        level="M"
+                        includeMargin
+                      />
+                      <p className="qr-caption">Print and attach to product packaging</p>
+                      <button className="copy-btn" onClick={() => downloadQrCode("product-qr", `${issuedAttestation.attestation_id}-product-qr.png`)}>
+                        Download QR (.png)
+                      </button>
+                    </div>
+                    <div className="issued-qr" id="attestation-qr">
+                      <p className="eyebrow">Full attestation QR</p>
+                      <QRCodeCanvas
+                        value={JSON.stringify(issuedAttestation)}
+                        size={180}
+                        level="M"
+                        includeMargin
+                      />
+                      <p className="qr-caption">Scan for offline cryptographic record</p>
+                      <button className="copy-btn" onClick={() => downloadQrCode("attestation-qr", `${issuedAttestation.attestation_id}-attestation-qr.png`)}>
+                        Download QR (.png)
+                      </button>
+                    </div>
                   </div>
 
                   <div className="issued-actions">
                     <GcdsButton onClick={() => downloadAttestation(issuedAttestation)}>
                       Download signed attestation (.json)
-                    </GcdsButton>
-                    <GcdsButton buttonRole="secondary" onClick={() => downloadQrCode(issuedAttestation.attestation_id)}>
-                      Download QR code (.png)
                     </GcdsButton>
                     <GcdsButton buttonRole="secondary" onClick={() => copyToClipboard(JSON.stringify(issuedAttestation, null, 2), "json")}>
                       {copiedField === "json" ? "Copied to clipboard!" : "Copy full JSON"}
