@@ -87,7 +87,7 @@ export default function App() {
 
       <main id="main-content">
         <section className="hero">
-          <GcdsContainer size="xl">
+          <GcdsContainer size="xl" centered padding>
             <p className="eyebrow">Cryptographic provenance service</p>
             <h1>Verify Canadian content claims before procurement decisions are made</h1>
             <p className="hero-copy">
@@ -104,7 +104,7 @@ export default function App() {
           </GcdsContainer>
         </section>
 
-        <GcdsContainer size="xl">
+        <GcdsContainer size="xl" centered padding>
           {error && (
             <GcdsNotice noticeRole="danger" noticeTitle="Something needs attention" noticeTitleTag="h2">
               <p className="notice-copy">{error}</p>

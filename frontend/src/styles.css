@@ -8,6 +8,35 @@ body {
   margin: 0;
 }
 
+/* Ensure the main content area is never wider than the page and is always centred */
+main {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Centering & horizontal padding ──────────────────────────────────────────
+   GcdsContainer (size="xl" centered padding) already sets margin:auto inside
+   its shadow DOM, but the custom-element host itself is display:block and
+   stretches full width by default. We reinforce centering at the host level
+   so every GcdsContainer on the page is capped and centred. The xl breakpoint
+   in GCDS is 1400 px; we match that so nothing overrides wider screens.
+──────────────────────────────────────────────────────────────────────────── */
+gcds-container {
+  display: block;
+  box-sizing: border-box;
+  max-width: 1400px;
+  margin-inline: auto;
+  /* Horizontal padding ensures content never touches viewport edges on mobile */
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+
+/* The hero stretches edge-to-edge (full bleed background) but its inner
+   GcdsContainer must still be capped — handled by the rule above.
+   We reset the outer .hero padding-inline so the gradient stays full-bleed. */
+.hero > gcds-container {
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+
 code {
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   font-size: 0.875em;
@@ -25,6 +54,8 @@ code {
   color: #fff;
   padding: 3rem 0;
   margin-bottom: 2rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .hero h1 {
