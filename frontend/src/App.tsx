@@ -309,11 +309,6 @@ export default function App() {
                   Scan a product QR code with your camera or enter a product attestation ID manually. The product record is verified by the same backend used by the challenge harness.
                 </p>
                 <div className="qr-lookup">
-                  <div className="qr-card" aria-label={`QR code for product ${SAMPLE_PRODUCT_ID}`}>
-                    <QRCodeSVG value={SAMPLE_PRODUCT_ID} size={150} level="M" includeMargin />
-                    <p>Product QR code</p>
-                    <span>Scan to verify provenance</span>
-                  </div>
                   <div className="lookup-form">
                     <GcdsInput
                       inputId="product-id"
@@ -324,7 +319,6 @@ export default function App() {
                     <div className="button-row compact">
                       <GcdsButton onClick={() => lookupProduct()}>{loading ? "Looking up..." : "Verify product"}</GcdsButton>
                       <GcdsButton buttonRole="secondary" onClick={startScanner}>Scan QR with camera</GcdsButton>
-                      <GcdsButton buttonRole="secondary" onClick={() => lookupProduct(SAMPLE_PRODUCT_ID)}>Load sample product</GcdsButton>
                     </div>
                     <div className={scannerActive ? "scanner-panel active" : "scanner-panel"}>
                       <div id="qr-reader" aria-label="Camera QR scanner" />
