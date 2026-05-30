@@ -1,5 +1,24 @@
 __pycache__/
+*.pyc
+*.pyo
 .DS_Store
+.env
+.venv/
+venv/
+node_modules/
 frontend/node_modules/
 frontend/dist/
 frontend/tsconfig.tsbuildinfo
+
+# IDE / debug
+.vscode/
+.idea/
+*.swp
+*.swo
+*.log
+.debugger/
+*.debug
+.pytest_cache/
+.coverage
+htmlcov/
+debug_*.py

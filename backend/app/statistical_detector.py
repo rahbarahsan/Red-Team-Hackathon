@@ -26,9 +26,12 @@ MIN_SAMPLES = 20
 ORIGIN_PROB_THRESHOLD = 0.02
 
 _raw: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
+_raw_linear: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
 _country_counts: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
 _name_country_counts: dict[tuple[str, str], dict[str, int]] = defaultdict(lambda: defaultdict(int))
+_name_rate_stats: dict[tuple[str, str], dict[str, float]] = {}
 _compiled: dict[str, dict[str, dict[str, float]]] = {}
+_compiled_linear: dict[str, dict[str, dict[str, float]]] = {}
 
 
 def _as_float(value: Any) -> float:
@@ -81,15 +84,20 @@ def _train() -> None:
                 hours = _as_float(costs.get("labour_hours"))
                 labour = _as_float(costs.get("labour_cost_cad"))
                 material = _as_float(costs.get("material_cad"))
+                output_name = att.get("output", {}).get("name", "")
                 if hours > 0:
                     _raw[action]["effective_rate"].append(_log(labour / hours))
                     _raw[action]["labour_hours"].append(_log(hours))
+                    _raw_linear[action]["effective_rate"].append(labour / hours)
+                    _raw_linear[action]["labour_hours"].append(hours)
+                    _raw_linear[(action, output_name)]["effective_rate"].append(labour / hours)
                 if material > 0:
                     _raw[action]["material_cad"].append(_log(material))
+                    _raw_linear[action]["material_cad"].append(material)
                 country = att.get("performed_in_country")
                 if country:
                     _country_counts[action][country] += 1
-                    _name_country_counts[(action, att.get("output", {}).get("name", ""))][country] += 1
+                    _name_country_counts[(action, output_name)][country] += 1
                 child_ts = _parse_ts(att.get("timestamp", ""))
                 for parent_ref in att.get("parents", []) or []:
                     parent = att_map.get(parent_ref.get("attestation_id"))
@@ -106,8 +114,30 @@ def _train() -> None:
             if stats:
                 _compiled[action][name] = stats
 
+    for key, features in _raw_linear.items():
+        if isinstance(key, tuple):
+            action, output_name = key
+            for fname, values in features.items():
+                s = _stats(values)
+                if s:
+                    _name_rate_stats[(action, output_name)] = s
+        else:
+            _compiled_linear[key] = {}
+            for fname, values in features.items():
+                s = _stats(values)
+                if s:
+                    _compiled_linear[key][fname] = s
+
 
 _train()
+
+
+LINEAR_RATE_THRESHOLDS = {
+    "component_manufacture": 3.0,
+    "subassembly": 3.0,
+    "final_integration": 3.2,
+}
+NAME_RATE_THRESHOLD = 2.5
 
 
 def detect_statistical_anomalies(attestations: list[dict], z_threshold: float = Z_THRESHOLD) -> list[dict]:
@@ -121,53 +151,86 @@ def detect_statistical_anomalies(attestations: list[dict], z_threshold: float = 
         hours = _as_float(costs.get("labour_hours"))
         labour = _as_float(costs.get("labour_cost_cad"))
         material = _as_float(costs.get("material_cad"))
+        output_name = att.get("output", {}).get("name", "")
+
+        flagged = False
+
+        if hours > 0 and not flagged:
+            raw_rate = labour / hours
+            linear_stats = _compiled_linear.get(action, {}).get("effective_rate")
+            if linear_stats:
+                z_raw = _z(raw_rate, linear_stats)
+                threshold = LINEAR_RATE_THRESHOLDS.get(action, 3.0)
+                if z_raw > threshold:
+                    result.append(
+                        {
+                            "type": "statistical_cost_anomaly",
+                            "attestation_id": att_id,
+                            "details": f"effective_rate {raw_rate:.1f} is {z_raw:.1f} sigma from clean {action} mean",
+                        }
+                    )
+                    flagged = True
+
+            if not flagged:
+                name_stats = _name_rate_stats.get((action, output_name))
+                if name_stats and name_stats["n"] >= MIN_SAMPLES:
+                    z_name = _z(raw_rate, name_stats)
+                    if z_name > NAME_RATE_THRESHOLD:
+                        result.append(
+                            {
+                                "type": "statistical_cost_anomaly",
+                                "attestation_id": att_id,
+                                "details": f"effective_rate {raw_rate:.1f} is {z_name:.1f} sigma from clean {action}/{output_name} mean",
+                            }
+                        )
+                        flagged = True
 
         checks: list[tuple[str, float, str]] = []
-        if hours > 0 and "effective_rate" in stats:
-            checks.append(("statistical_cost_anomaly", _log(labour / hours), "effective_rate"))
-        if hours > 0 and "labour_hours" in stats:
-            checks.append(("statistical_labour_anomaly", _log(hours), "labour_hours"))
-        if material > 0 and "material_cad" in stats:
-            checks.append(("statistical_material_anomaly", _log(material), "material_cad"))
+        if not flagged:
+            if hours > 0 and "labour_hours" in stats:
+                checks.append(("statistical_labour_anomaly", _log(hours), "labour_hours"))
+            if material > 0 and "material_cad" in stats:
+                checks.append(("statistical_material_anomaly", _log(material), "material_cad"))
 
-        child_ts = _parse_ts(att.get("timestamp", ""))
-        gaps = []
-        for parent_ref in att.get("parents", []) or []:
-            parent = att_map.get(parent_ref.get("attestation_id"))
-            parent_ts = _parse_ts(parent.get("timestamp", "")) if parent else None
-            if child_ts and parent_ts:
-                gaps.append(max((child_ts - parent_ts).total_seconds() / 3600, 0.0))
-        if gaps and "parent_gap_hours" in stats:
-            checks.append(("statistical_timing_anomaly", _log(min(gaps)), "parent_gap_hours"))
+            child_ts = _parse_ts(att.get("timestamp", ""))
+            gaps = []
+            for parent_ref in att.get("parents", []) or []:
+                parent = att_map.get(parent_ref.get("attestation_id"))
+                parent_ts = _parse_ts(parent.get("timestamp", "")) if parent else None
+                if child_ts and parent_ts:
+                    gaps.append(max((child_ts - parent_ts).total_seconds() / 3600, 0.0))
+            if gaps and "parent_gap_hours" in stats:
+                checks.append(("statistical_timing_anomaly", _log(min(gaps)), "parent_gap_hours"))
 
-        feature_thresholds = {
-            "effective_rate": 3.4,
-            "material_cad": 3.4,
-            "labour_hours": 3.4,
-            "parent_gap_hours": 3.4,
-        }
-        for anomaly_type, value, feature in checks:
-            z = _z(value, stats[feature])
-            if z > feature_thresholds.get(feature, z_threshold):
+            feature_thresholds = {
+                "material_cad": 3.4,
+                "labour_hours": 3.4,
+                "parent_gap_hours": 4.2,
+            }
+            for anomaly_type, value, feature in checks:
+                z = _z(value, stats[feature])
+                if z > feature_thresholds.get(feature, z_threshold):
+                    result.append(
+                        {
+                            "type": anomaly_type,
+                            "attestation_id": att_id,
+                            "details": f"{feature} is {z:.1f} sigma from clean {action} profile",
+                        }
+                    )
+                    flagged = True
+                    break
+
+        if not flagged:
+            country_counts = _name_country_counts.get((action, output_name), {})
+            country = att.get("performed_in_country")
+            total = sum(country_counts.values())
+            country_probability = country_counts.get(country, 0) / total if total else 1.0
+            if total >= 50 and country and country_probability < ORIGIN_PROB_THRESHOLD:
                 result.append(
                     {
-                        "type": anomaly_type,
+                        "type": "statistical_origin_anomaly",
                         "attestation_id": att_id,
-                        "details": f"{feature} is {z:.1f} sigma from clean {action} profile",
+                        "details": f"{country} not observed for clean {action} attestations",
                     }
                 )
-                break
-
-        country_counts = _name_country_counts.get((action, att.get("output", {}).get("name", "")), {})
-        country = att.get("performed_in_country")
-        total = sum(country_counts.values())
-        country_probability = country_counts.get(country, 0) / total if total else 1.0
-        if total >= 50 and country and country_probability < ORIGIN_PROB_THRESHOLD:
-            result.append(
-                {
-                    "type": "statistical_origin_anomaly",
-                    "attestation_id": att_id,
-                    "details": f"{country} not observed for clean {action} attestations",
-                }
-            )
     return result
