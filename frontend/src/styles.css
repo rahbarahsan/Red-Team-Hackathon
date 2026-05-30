@@ -999,6 +999,23 @@ dd {
   margin: 0;
 }
 
+.chain-loaded-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: #e7f3ed;
+  border: 1px solid #198754;
+  border-radius: 4px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #0f5132;
+}
+
+.chain-loaded-icon {
+  font-size: 1.1rem;
+}
+
 @media (max-width: 980px) {
   .workspace,
   .qr-lookup,

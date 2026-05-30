@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   GcdsButton,
   GcdsContainer,
+  GcdsDetails,
   GcdsFooter,
   GcdsHeader,
   GcdsInput,
@@ -344,17 +345,25 @@ export default function App() {
                     </p>
                   </div>
                 )}
-                <GcdsTextarea
-                  textareaId="chain-json"
-                  label="Attestation chain JSON"
-                  rows={18}
-                  value={chainText}
-                  onGcdsInput={(event: CustomEvent) => setChainText(String(event.detail.value))}
-                />
-                <div className="button-row">
-                  <GcdsButton onClick={() => verify()}>{loading ? "Verifying..." : "Verify chain"}</GcdsButton>
-                  <GcdsButton buttonRole="secondary" onClick={loadSample}>Load worked example JSON</GcdsButton>
-                </div>
+                {chain && (
+                  <div className="chain-loaded-bar">
+                    <span className="chain-loaded-icon">✓</span>
+                    <span>{chain.attestations.length} attestations loaded for <code>{chain.product_attestation_id}</code></span>
+                  </div>
+                )}
+                <GcdsDetails detailsTitle="View raw attestation chain JSON">
+                  <GcdsTextarea
+                    textareaId="chain-json"
+                    label="Attestation chain JSON"
+                    rows={14}
+                    value={chainText}
+                    onGcdsInput={(event: CustomEvent) => setChainText(String(event.detail.value))}
+                  />
+                  <div className="button-row compact">
+                    <GcdsButton onClick={() => verify()}>{loading ? "Verifying..." : "Re-verify chain"}</GcdsButton>
+                    <GcdsButton buttonRole="secondary" onClick={loadSample}>Load worked example JSON</GcdsButton>
+                  </div>
+                </GcdsDetails>
               </section>
 
               <section className="result-panel" aria-live="polite">
