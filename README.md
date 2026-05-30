@@ -43,6 +43,12 @@ docker compose up --build
 - Backend health check: `http://localhost:8000/health`
 - Demo frontend: `http://localhost:5173`
 
+Demo API endpoints used by the UIs:
+
+- `GET /products` lists demo products.
+- `GET /products/att-anchor-0012/chain` resolves the recovery-drone chain for product lookup / QR simulation.
+- `POST /issue-attestation` signs an unsigned supplier attestation using the challenge-kit supplier private keys.
+
 Run the local grader after the backend is up:
 
 ```bash

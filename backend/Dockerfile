@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 COPY backend /app/backend
 COPY reference_lib /app/reference_lib
 COPY registry /app/registry
+COPY private_keys /app/private_keys
 COPY training_corpus.jsonl /app/training_corpus.jsonl
 COPY worked-example /app/worked-example
 
