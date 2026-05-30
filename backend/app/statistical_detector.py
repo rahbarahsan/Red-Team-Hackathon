@@ -137,6 +137,11 @@ LINEAR_RATE_THRESHOLDS = {
     "subassembly": 3.0,
     "final_integration": 3.2,
 }
+LINEAR_HOURS_THRESHOLDS = {
+    "component_manufacture": 2.6,
+    "subassembly": 2.6,
+    "final_integration": 3.0,
+}
 NAME_RATE_THRESHOLD = 2.5
 
 
@@ -175,12 +180,28 @@ def detect_statistical_anomalies(attestations: list[dict], z_threshold: float = 
                 name_stats = _name_rate_stats.get((action, output_name))
                 if name_stats and name_stats["n"] >= MIN_SAMPLES:
                     z_name = _z(raw_rate, name_stats)
-                    if z_name > NAME_RATE_THRESHOLD:
+                    name_threshold = NAME_RATE_THRESHOLD
+                    if z_name > name_threshold:
                         result.append(
                             {
                                 "type": "statistical_cost_anomaly",
                                 "attestation_id": att_id,
                                 "details": f"effective_rate {raw_rate:.1f} is {z_name:.1f} sigma from clean {action}/{output_name} mean",
+                            }
+                        )
+                        flagged = True
+
+            if not flagged:
+                hours_stats = _compiled_linear.get(action, {}).get("labour_hours")
+                if hours_stats:
+                    z_hours = _z(hours, hours_stats)
+                    hours_threshold = LINEAR_HOURS_THRESHOLDS.get(action, 3.0)
+                    if z_hours > hours_threshold:
+                        result.append(
+                            {
+                                "type": "statistical_labour_anomaly",
+                                "attestation_id": att_id,
+                                "details": f"labour_hours {hours:.1f} is {z_hours:.1f} sigma from clean {action} mean",
                             }
                         )
                         flagged = True
