@@ -13,10 +13,12 @@
     "@gcds-core/components-react": "latest",
     "@gcds-core/css-shortcuts": "latest",
     "@vitejs/plugin-react": "latest",
-    "vite": "latest",
-    "typescript": "latest",
+    "html5-qrcode": "^2.3.8",
+    "qrcode.react": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "typescript": "latest",
+    "vite": "latest"
   },
   "devDependencies": {
     "@types/react": "latest",

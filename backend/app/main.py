@@ -4,6 +4,7 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.routes.demo import router as demo_router
 from app.routes.verify import router as verify_router
 
 app = FastAPI(
@@ -21,6 +22,7 @@ app.add_middleware(
 )
 
 app.include_router(verify_router)
+app.include_router(demo_router)
 
 
 @app.get("/health")
@@ -30,7 +32,9 @@ def health() -> dict[str, str]:
 
 @app.get("/sample-chain")
 def sample_chain() -> dict:
-    root = os.environ.get("PROJECT_ROOT", os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+    root = os.environ.get(
+        "PROJECT_ROOT", os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+    )
     path = os.path.join(root, "worked-example", "recovery_drone_chain.json")
     try:
         with open(path, encoding="utf-8") as fh:
