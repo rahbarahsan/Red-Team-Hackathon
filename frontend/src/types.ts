@@ -42,10 +42,27 @@ export interface AnomalyRecord {
   details: string;
 }
 
+export interface EthicalRisk {
+  level: "low" | "medium" | "high" | "critical";
+  category: "labor_conditions" | "child_labor" | "environmental" | "transparency";
+  confidence: number;
+  details: string;
+}
+
+export interface ConfidenceScore {
+  overall: number;
+  cryptographic: number;
+  statistical: number;
+  ethical: number;
+  reasoning: string[];
+}
+
 export interface VerifyResult {
   product_attestation_id: string;
   canadian_content_percentage: number;
   designation: "product_of_canada" | "made_in_canada" | "none";
   chain_valid: boolean;
   anomalies: AnomalyRecord[];
+  ethical_risks?: EthicalRisk[];
+  confidence_score?: ConfidenceScore;
 }

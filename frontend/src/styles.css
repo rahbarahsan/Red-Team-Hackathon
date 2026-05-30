@@ -42,6 +42,361 @@ code {
   font-size: 0.875em;
 }
 
+/* ── Ethical Assessment & Canada.ca Compliance ────────────────────────────────
+   Enhanced components following Canada.ca design guidelines
+──────────────────────────────────────────────────────────────────────────── */
+
+/* Ethical Assessment Layout */
+.ethical-assessment {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.confidence-breakdown {
+  margin-top: 1rem;
+}
+
+.confidence-metrics {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.confidence-metrics div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border-left: 3px solid #00703C;
+}
+
+.confidence-metrics dt {
+  font-weight: 600;
+  color: #1f2933;
+}
+
+.confidence-metrics dd {
+  font-weight: 700;
+  color: #00703C;
+  margin: 0;
+}
+
+/* Risk Assessment */
+.risk-overview {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.risk-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  color: white;
+  text-align: center;
+  min-width: 120px;
+}
+
+.risk-level {
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
+}
+
+.risk-subtitle {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  margin-top: 0.25rem;
+}
+
+.risk-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.risk-item {
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: 6px;
+  border-left: 4px solid;
+}
+
+.risk-item.risk-low {
+  background: #f0f9ff;
+  border-color: #00703C;
+}
+
+.risk-item.risk-medium {
+  background: #fffbf0;
+  border-color: #FF8C00;
+}
+
+.risk-item.risk-high {
+  background: #fef2f2;
+  border-color: #D3080C;
+}
+
+.risk-item.risk-critical {
+  background: #fdf2f2;
+  border-color: #8B0000;
+}
+
+.risk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.confidence-indicator {
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: normal;
+}
+
+.risk-indicator {
+  font-size: 0.75rem;
+  color: #666;
+  margin-left: 0.5rem;
+}
+
+.disclosure {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  color: #666;
+}
+
+.guidance-content h4 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #1f2933;
+  font-weight: 600;
+}
+
+.legal-notice {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #f0f9ff;
+  border-left: 4px solid #00703C;
+  border-radius: 4px;
+}
+
+/* Anomaly Explainer */
+.anomaly-explainer {
+  margin-bottom: 2rem;
+}
+
+.anomaly-list-detailed {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.severity-group {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.severity-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 1rem 0;
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.severity-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.anomaly-detail {
+  padding: 1.25rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.severity-critical .anomaly-detail {
+  border-color: #8B0000;
+  background: #fdf2f2;
+}
+
+.severity-high .anomaly-detail {
+  border-color: #D3080C;
+  background: #fef2f2;
+}
+
+.severity-medium .anomaly-detail {
+  border-color: #FF8C00;
+  background: #fffbf0;
+}
+
+.anomaly-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.anomaly-summary h5 {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2933;
+}
+
+.attestation-ref {
+  font-size: 0.75rem;
+  background: #f3f4f6;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.anomaly-description,
+.anomaly-details {
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+.remediation-steps {
+  margin: 1rem 0 0 0;
+  padding-left: 1.5rem;
+}
+
+.remediation-steps li {
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.critical-step {
+  font-weight: 700;
+  color: #8B0000;
+}
+
+.policy-references h5 {
+  margin: 1.5rem 0 0.75rem 0;
+  color: #1f2933;
+  font-weight: 600;
+}
+
+.policy-references ul,
+.policy-references ol {
+  line-height: 1.5;
+}
+
+/* Enhanced Timeline */
+.country-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.risk-badge-inline {
+  font-size: 0.625rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.risk-badge-inline.high-risk {
+  background: #D3080C;
+  color: white;
+}
+
+.risk-badge-inline.medium-risk {
+  background: #FF8C00;
+  color: white;
+}
+
+.certification-badge {
+  font-size: 0.625rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.certification-badge.verified {
+  background: #00703C;
+  color: white;
+}
+
+.certification-badge.pending {
+  background: #FF8C00;
+  color: white;
+}
+
+.certification-badge.missing {
+  background: #D3080C;
+  color: white;
+}
+
+/* Enhanced Timeline Cards */
+.timeline-card {
+  position: relative;
+}
+
+.has-anomaly .timeline-card {
+  border: 2px solid #D3080C;
+  background: #fef2f2;
+}
+
+.has-anomaly .timeline-card::before {
+  content: "!";
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #D3080C;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .confidence-metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .risk-overview {
+    grid-template-columns: 180px 1fr;
+  }
+  
+  .country-info {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
 .service-banner {
   background: #26374a;
   color: #fff;
