@@ -265,7 +265,12 @@ export default function ProvenanceTimeline({ verifyResult, attestations }: Props
       {/* Enhanced Anomaly Analysis */}
       <AnomalyExplainer anomalies={verifyResult.anomalies} />
 
-      {/* Remove Ethical Assessment for now */}
+      {/* Enhanced Ethical Assessment */}
+      <EthicalAssessment 
+        ethicalRisks={ethicalAssessment.ethicalRisks}
+        confidenceScore={ethicalAssessment.confidenceScore}
+        supplierBreakdown={ethicalAssessment.supplierBreakdown}
+      />
 
       <div className="timeline-block">
         <h2>Supply chain record</h2>
